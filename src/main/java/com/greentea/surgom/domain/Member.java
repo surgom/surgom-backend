@@ -3,7 +3,7 @@ package com.greentea.surgom.domain;
 import javax.persistence.*;
 
 @Entity
-public class User {
+public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "nickname")

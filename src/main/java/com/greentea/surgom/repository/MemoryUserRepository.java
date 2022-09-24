@@ -1,6 +1,6 @@
 package com.greentea.surgom.repository;
 
-import com.greentea.surgom.domain.User;
+import com.greentea.surgom.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +21,14 @@ public class MemoryUserRepository implements  UserRepository{
     EntityManager em;
 
     @Override
-    public Long save(User user) {
-        em.persist(user);
-        return user.getId();
+    public Long save(Member member) {
+        em.persist(member);
+        return member.getId();
     }
 
     @Override
-    public User findById(Long id) {
-        return em.find(User.class, id);
+    public Member findById(Long id) {
+        return em.find(Member.class, id);
     }
 
     @Override
@@ -42,29 +42,29 @@ public class MemoryUserRepository implements  UserRepository{
     }
 
     @Override
-    public List<User> findAllWithAge_range(String range) {
+    public List<Member> findAllWithAge_range(String range) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> from = cq.from(User.class);
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> from = cq.from(Member.class);
         Predicate where = cb.equal(from.get("age_range"), range);
         cq.where(where);
-        TypedQuery<User> query = em.createQuery(cq);
+        TypedQuery<Member> query = em.createQuery(cq);
         return query.getResultList();
     }
 
     @Override
-    public List<User> findAllWithGender(char gender) {
+    public List<Member> findAllWithGender(char gender) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> from = cq.from(User.class);
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> from = cq.from(Member.class);
         Predicate where = cb.equal(from.get("gender"), gender);
         cq.where(where);
-        TypedQuery<User> query = em.createQuery(cq);
+        TypedQuery<Member> query = em.createQuery(cq);
         return query.getResultList();
     }
 
     @Override
-    public void update(User user) {
-        em.merge(user);
+    public void update(Member member) {
+        em.merge(member);
     }
 }

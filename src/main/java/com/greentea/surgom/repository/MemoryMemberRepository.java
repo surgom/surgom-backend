@@ -15,25 +15,25 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MemoryUserRepository implements  UserRepository{
+public class MemoryMemberRepository implements MemberRepository {
 
-    @PersistenceContext
-    EntityManager em;
+//    @PersistenceContext
+    private final EntityManager em;
 
     @Override
-    public Long save(Member member) {
+    public String save(Member member) {
         em.persist(member);
-        return member.getId();
+        return member.getPhone();
     }
 
     @Override
-    public Member findById(Long id) {
-        return em.find(Member.class, id);
+    public Member findByPhone(String phone) {
+        return em.find(Member.class, phone);
     }
 
     @Override
-    public void delete(Long id) {
-        em.remove(findById(id));
+    public void delete(String phone) {
+        em.remove(findByPhone(phone));
     }
 
     @Override

@@ -42,6 +42,15 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
+    public List<Member> findAll() {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> from = cq.from(Member.class);
+        TypedQuery<Member> query = em.createQuery(cq);
+        return query.getResultList();
+    }
+
+    @Override
     public List<Member> findAllWithAge_range(String range) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Member> cq = cb.createQuery(Member.class);
@@ -65,6 +74,7 @@ public class MemoryMemberRepository implements MemberRepository {
 
     @Override
     public void update(Member member) {
+        em.detach(member);
         em.merge(member);
     }
 }

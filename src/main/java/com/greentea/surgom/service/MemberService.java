@@ -17,13 +17,12 @@ public class MemberService {
 
     @Transactional
     public String join(Member member) {
-//        validateDuplicateMember(member);
+        validateDuplicateMember(member);
         memoryMemberRepository.save(member);
         return member.getPhone();
     }
 
     private void validateDuplicateMember(Member member) {
-        System.out.println("member.getPhone() = " + member.getPhone());
         Member byPhone = memoryMemberRepository.findByPhone(member.getPhone());
         if (byPhone != null)
             throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -40,6 +39,8 @@ public class MemberService {
     public List<Member> findALl(char gender) {
         return memoryMemberRepository.findAllWithGender(gender);
     }
+
+    public List<Member> findAll() {return memoryMemberRepository.findAll();}
 
     public void withdraw(Member member) {
         memoryMemberRepository.delete(member.getPhone());

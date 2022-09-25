@@ -9,6 +9,7 @@ public interface MemberRepository {
     Member findByPhone(String phone);
     void delete(String phone);
     void deleteAll();
+    List<Member> findAll();
     List<Member> findAllWithAge_range(String range);
     List<Member> findAllWithGender(char gender);
     void update(Member member);

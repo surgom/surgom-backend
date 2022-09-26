@@ -13,7 +13,7 @@ public class Member {
     private String phone;
     private String nickname;
     private String name;
-    private int age;
+    private String age_range;
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private Long point;

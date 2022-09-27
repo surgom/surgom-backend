@@ -119,17 +119,17 @@ public class MemoryUserRepositoryTest {
         Member member = new Member();
         member.setName("박성하");
         member.setPhone("010-4172-8563");
-        member.setAge_range("20-29");
+        member.setAge(23);
 
         Member member2 = new Member();
         member2.setName("한보은");
         member2.setPhone("010-1234-5678");
-        member2.setAge_range("100-109");
+        member2.setAge(100);
 
         Member member3 = new Member();
         member3.setName("한보은");
         member3.setPhone("010-9876-5432");
-        member3.setAge_range("20-29");
+        member3.setAge(23);
 
         //when
         String phone = memberService.join(member);
@@ -143,10 +143,10 @@ public class MemoryUserRepositoryTest {
         memberService.update(member3);
 
         //then
-        List<Member> list = memberService.findAll("20-29");
+        List<Member> list = memberService.findAll(20, 29);
         assertEquals(list.size(), 2);
 
-        List<Member> list2 = memberService.findAll("100-109");
+        List<Member> list2 = memberService.findAll(100, 109);
         assertEquals(list2.size(), 1);
         assertEquals(list2.get(0).getName(), "한보은");
     }

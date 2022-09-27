@@ -10,7 +10,7 @@ public interface MemberRepository {
     void delete(String phone);
     void deleteAll();
     List<Member> findAll();
-    List<Member> findAllWithAge_range(String range);
+    List<Member> findAllWithAge_range(int first, int last);
     List<Member> findAllWithGender(char gender);
     void update(Member member);
 }

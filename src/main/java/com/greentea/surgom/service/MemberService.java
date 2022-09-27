@@ -32,8 +32,8 @@ public class MemberService {
         return memoryMemberRepository.findByPhone(memberPhone);
     }
 
-    public List<Member> findAll(String range) {
-        return memoryMemberRepository.findAllWithAge_range(range);
+    public List<Member> findAll(int first, int last) {
+        return memoryMemberRepository.findAllWithAge_range(first, last);
     }
 
     public List<Member> findALl(char gender) {

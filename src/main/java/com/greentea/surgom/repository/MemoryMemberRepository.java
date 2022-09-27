@@ -51,11 +51,11 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
-    public List<Member> findAllWithAge_range(String range) {
+    public List<Member> findAllWithAge_range(int first, int last) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Member> cq = cb.createQuery(Member.class);
         Root<Member> from = cq.from(Member.class);
-        Predicate where = cb.equal(from.get("age_range"), range);
+        Predicate where = cb.between(from.get("age"), first, last);
         cq.where(where);
         TypedQuery<Member> query = em.createQuery(cq);
         return query.getResultList();

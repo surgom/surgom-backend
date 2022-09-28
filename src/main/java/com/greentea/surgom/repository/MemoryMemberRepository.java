@@ -1,5 +1,6 @@
 package com.greentea.surgom.repository;
 
+import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -62,13 +63,29 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
-    public List<Member> findAllWithGender(char gender) {
+    public List<Member> findAllWithGender(String gender) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Member> cq = cb.createQuery(Member.class);
         Root<Member> from = cq.from(Member.class);
-        Predicate where = cb.equal(from.get("gender"), gender);
+
+        Gender user_gender;
+        if (gender.equals("FEMALE")) user_gender = Gender.FEMALE;
+        else user_gender = Gender.MALE;
+
+        Predicate where = cb.equal(from.get("gender"), user_gender);
         cq.where(where);
         TypedQuery<Member> query = em.createQuery(cq);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Member> findAllWithAgeAndGender(int first, int last, String gender) {
+        Gender user_gender;
+        if (gender.equals("FEMALE")) user_gender = Gender.FEMALE;
+        else user_gender = Gender.MALE;
+
+        String jpql = "SELECT o FROM Member o WHERE o.age BETWEEN :first AND :last AND o.gender=:user_gender";
+        TypedQuery<Member> query = em.createQuery(jpql, Member.class);
         return query.getResultList();
     }
 

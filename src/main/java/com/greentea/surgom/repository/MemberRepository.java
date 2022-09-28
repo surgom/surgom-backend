@@ -11,6 +11,7 @@ public interface MemberRepository {
     void deleteAll();
     List<Member> findAll();
     List<Member> findAllWithAge_range(int first, int last);
-    List<Member> findAllWithGender(char gender);
+    List<Member> findAllWithGender(String gender);
+    List<Member> findAllWithAgeAndGender(int first, int last, String gender);
     void update(Member member);
 }

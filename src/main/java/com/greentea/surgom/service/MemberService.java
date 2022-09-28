@@ -1,5 +1,6 @@
 package com.greentea.surgom.service;
 
+import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.repository.MemoryMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +37,11 @@ public class MemberService {
         return memoryMemberRepository.findAllWithAge_range(first, last);
     }
 
-    public List<Member> findALl(char gender) {
+    public List<Member> findALl(String gender) {
         return memoryMemberRepository.findAllWithGender(gender);
     }
+
+    public List<Member> findAll(int first, int last, String gender) {return memoryMemberRepository.findAllWithAgeAndGender(first, last, gender);}
 
     public List<Member> findAll() {return memoryMemberRepository.findAll();}
 

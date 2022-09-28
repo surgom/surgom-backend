@@ -1,5 +1,6 @@
 package com.greentea.surgom.repository;
 
+import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.service.MemberService;
 import org.junit.Test;
@@ -138,9 +139,6 @@ public class MemoryUserRepositoryTest {
         em.flush();
         String phone3 = memberService.join(member3);
         em.flush();
-        memberService.update(member);
-        memberService.update(member2);
-        memberService.update(member3);
 
         //then
         List<Member> list = memberService.findAll(20, 29);
@@ -149,5 +147,79 @@ public class MemoryUserRepositoryTest {
         List<Member> list2 = memberService.findAll(100, 109);
         assertEquals(list2.size(), 1);
         assertEquals(list2.get(0).getName(), "한보은");
+    }
+
+    @Test
+    public void 성별로_회원_찾기() {
+        //given
+        Member member = new Member();
+        member.setName("박성하");
+        member.setPhone("010-4172-8563");
+        member.setGender(Gender.FEMALE);
+
+        Member member2 = new Member();
+        member2.setName("박성하");
+        member2.setPhone("010-1234-5678");
+        member2.setGender(Gender.MALE);
+
+        Member member3 = new Member();
+        member3.setName("한보은");
+        member3.setPhone("010-9876-5432");
+        member3.setGender(Gender.FEMALE);
+
+        //when
+        String phone = memberService.join(member);
+        em.flush();
+        String phone2 = memberService.join(member2);
+        em.flush();
+        String phone3 = memberService.join(member3);
+        em.flush();
+
+        //then
+        List<Member> female = memberService.findALl("FEMALE");
+        assertEquals(female.size(), 2);
+
+        List<Member> male = memberService.findALl("MALE");
+        assertEquals(male.size(), 1);
+        assertEquals(male.get(0).getPhone(), "010-1234-5678");
+    }
+
+    @Test
+    public void 연령대와_성별로_사람_찾기() {
+        //given
+        Member member = new Member();
+        member.setName("박성하");
+        member.setPhone("010-4172-8563");
+        member.setAge(23);
+        member.setGender(Gender.FEMALE);
+
+        Member member2 = new Member();
+        member2.setName("박성하");
+        member2.setPhone("010-1234-5678");
+        member.setAge(23);
+        member2.setGender(Gender.MALE);
+
+        Member member3 = new Member();
+        member3.setName("한보은");
+        member3.setPhone("010-9876-5432");
+        member.setAge(100);
+        member3.setGender(Gender.FEMALE);
+
+        //when
+        String phone = memberService.join(member);
+        em.flush();
+        String phone2 = memberService.join(member2);
+        em.flush();
+        String phone3 = memberService.join(member3);
+        em.flush();
+
+        //then
+        List<Member> list = memberService.findAll(20, 29, "FEMALE");
+        assertEquals(list.size(), 1);
+        assertEquals(list.get(0).getPhone(), "010-4172-8563");
+
+        List<Member> list2 = memberService.findAll(20, 29, "MALE");
+        assertEquals(list2.size(), 1);
+        assertEquals(list2.get(0).getPhone(), "010-1234-5678");
     }
 }

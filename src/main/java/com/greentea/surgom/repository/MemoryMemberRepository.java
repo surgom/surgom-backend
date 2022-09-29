@@ -80,12 +80,20 @@ public class MemoryMemberRepository implements MemberRepository {
 
     @Override
     public List<Member> findAllWithAgeAndGender(int first, int last, String gender) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> from = cq.from(Member.class);
+
         Gender user_gender;
         if (gender.equals("FEMALE")) user_gender = Gender.FEMALE;
         else user_gender = Gender.MALE;
 
-        String jpql = "SELECT o FROM Member o WHERE o.age BETWEEN :first AND :last AND o.gender=:user_gender";
-        TypedQuery<Member> query = em.createQuery(jpql, Member.class);
+        Predicate where1 = cb.equal(from.get("gender"), user_gender);
+        Predicate where2 = cb.between(from.get("age"), first, last);
+
+        Predicate where = cb.and(where1, where2);
+        cq.where(where);
+        TypedQuery<Member> query = em.createQuery(cq);
         return query.getResultList();
     }
 

@@ -1,5 +1,6 @@
 package com.greentea.surgom.repository;
 
+import com.greentea.surgom.domain.Authority;
 import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.service.MemberService;
@@ -196,13 +197,13 @@ public class MemoryUserRepositoryTest {
         Member member2 = new Member();
         member2.setName("박성하");
         member2.setPhone("010-1234-5678");
-        member.setAge(23);
+        member2.setAge(23);
         member2.setGender(Gender.MALE);
 
         Member member3 = new Member();
         member3.setName("한보은");
         member3.setPhone("010-9876-5432");
-        member.setAge(100);
+        member3.setAge(100);
         member3.setGender(Gender.FEMALE);
 
         //when
@@ -221,5 +222,29 @@ public class MemoryUserRepositoryTest {
         List<Member> list2 = memberService.findAll(20, 29, "MALE");
         assertEquals(list2.size(), 1);
         assertEquals(list2.get(0).getPhone(), "010-1234-5678");
+    }
+
+    @Test
+    public void 권한_검사() {
+        //given
+        Member member = new Member();
+        member.setName("박성하");
+        member.setPhone("010-4172-8563");
+        member.setAuthority(Authority.ADMIN);
+
+        Member member2 = new Member();
+        member2.setName("한보은");
+        member2.setPhone("010-1234-5678");
+        member2.setAuthority(Authority.USER);
+
+        //when
+        String phone = memberService.join(member);
+        em.flush();
+        String phone2 = memberService.join(member2);
+        em.flush();
+
+        //then
+        assertEquals(memberService.findOne("010-4172-8563").getAuthority(), Authority.ADMIN);
+        assertEquals(memberService.findOne("010-1234-5678").getAuthority(), Authority.USER);
     }
 }

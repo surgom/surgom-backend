@@ -33,6 +33,21 @@ public class MemoryMemberRepository implements MemberRepository {
     }
 
     @Override
+    public Member findByPhoneAndIdentifier(String phone, String identifier) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Member> cq = cb.createQuery(Member.class);
+        Root<Member> from = cq.from(Member.class);
+
+        Predicate where1 = cb.equal(from.get("phone"), phone);
+        Predicate where2 = cb.equal(from.get("identifier"), identifier);
+
+        Predicate where = cb.or(where1, where2);
+        cq.where(where);
+        TypedQuery<Member> query = em.createQuery(cq);
+        return query.getResultList().get(0);
+    }
+
+    @Override
     public void delete(String phone) {
         em.remove(findByPhone(phone));
     }

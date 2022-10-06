@@ -7,6 +7,7 @@ import java.util.List;
 public interface MemberRepository {
     String save(Member member);
     Member findByPhone(String phone);
+    Member findByPhoneAndIdentifier(String phone, String identifier);
     void delete(String phone);
     void deleteAll();
     List<Member> findAll();

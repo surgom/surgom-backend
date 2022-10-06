@@ -19,5 +19,6 @@ public class Member {
     private Long point;
     @Enumerated(EnumType.STRING)
     private Authority authority;
+    private String identifier;
 }
 

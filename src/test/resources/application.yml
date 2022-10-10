@@ -23,9 +23,9 @@ security:
     client:
       registration:
         naver:
-          client-id: 클라이언트 아이디
-          client-secret: 클라이언트 비밀번호
-          scope: name,email,profile_image
+          client-id: Fa4c6MoWa2R3LkkOiUoq
+          client-secret: I2ML0NJo5m
+          scope: name,gender,birthyear,mobile,id
           redirect_uri_template: '{baseUrl}/{action}/oauth2/code/{registrationId}'
           authorization_grant_type: authorization_code
           client-name: Naver

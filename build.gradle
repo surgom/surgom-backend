@@ -27,6 +27,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-client:5.7.3'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
 }
 
 tasks.named('test') {

@@ -3,18 +3,16 @@ package com.greentea.surgom.repository;
 import com.greentea.surgom.domain.Authority;
 import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
-import com.greentea.surgom.service.MemberService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -24,9 +22,7 @@ import static org.junit.Assert.fail;
 @Transactional
 public class MemoryUserRepositoryTest {
 
-    @Autowired MemoryMemberRepository memoryMemberRepository;
-    @Autowired MemberService memberService;
-    @Autowired EntityManager em;
+    @Autowired private MemberRepository memberRepository;
 
     @Test
     public void 회원가입() throws Exception {
@@ -36,15 +32,13 @@ public class MemoryUserRepositoryTest {
         member.setPhone("010-4172-8563");
 
         //when
-        String phone = memberService.join(member);
-
+        Member member_result = memberRepository.save(member);
 
         //then
-        em.flush();
-        assertEquals(member, memberService.findOne(member.getPhone()));
+        assertEquals(member.getPhone(), member_result.getPhone());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = AssertionError.class)
     public void 중복회원예외() {
         //given
         Member member = new Member();
@@ -56,8 +50,8 @@ public class MemoryUserRepositoryTest {
         member2.setPhone("010-4172-8563");
 
         //when
-        String phone = memberService.join(member);
-        String phone2 = memberService.join(member2);
+        memberRepository.save(member);
+        memberRepository.save(member2);
 
         //then
         fail("예외가 발생했습니다.");
@@ -71,11 +65,11 @@ public class MemoryUserRepositoryTest {
         member.setPhone("010-4172-8563");
 
         //when
-        String phone = memberService.join(member);
-        memberService.withdraw(member);
+        Member member_result = memberRepository.save(member);
+        memberRepository.delete(member_result);
 
         //then
-        assertEquals(memberService.findOne(phone), null);
+        assertEquals(memberRepository.findByPhone(member.getPhone()), Optional.empty());
     }
 
     @Test
@@ -90,29 +84,45 @@ public class MemoryUserRepositoryTest {
         member2.setPhone("010-1234-5678");
 
         //when
-        String phone = memberService.join(member);
-        String phone2 = memberService.join(member2);
-        memberService.withdrawAll();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.deleteAllInBatch();
 
         //then
-        assertEquals(memberService.findAll().size(), 0);
+        assertEquals(memberRepository.findAll().size(), 0);
     }
 
     @Test
-    public void 개인정보_변경() {
+    public void 전화번호_제외_개인정보_변경() {
         //given
         Member member = new Member();
         member.setName("박성하");
         member.setPhone("010-4172-8563");
 
         //when
-        String phone = memberService.join(member);
-        member.setPhone("010-1234-5678");
-        memberService.update(member);
+        Member member_result = memberRepository.save(member);
+        member.setName("한보은");
+        memberRepository.save(member);
 
         //then
-        assertEquals(memberService.findOne(phone), null);
-        assertEquals(memberService.findOne("010-1234-5678").getName(), "박성하");
+        assertEquals(memberRepository.findByPhone("010-4172-8563").get().getName(), "한보은");
+    }
+
+    @Test
+    public void 전화번호_변경() {
+        //given
+        Member member = new Member();
+        member.setName("박성하");
+        member.setPhone("010-4172-8563");
+        member.setIdentifier("its' me");
+
+        //when
+        Member member_result = memberRepository.save(member);
+        member.setPhone("010-1234-5678");
+        memberRepository.updatePhone(member.getPhone(), member.getIdentifier());
+
+        //then
+        assertEquals(memberRepository.findByPhone(member.getPhone()).get().getIdentifier(), member.getIdentifier());
     }
 
     @Test
@@ -134,18 +144,15 @@ public class MemoryUserRepositoryTest {
         member3.setAge(23);
 
         //when
-        String phone = memberService.join(member);
-        em.flush();
-        String phone2 = memberService.join(member2);
-        em.flush();
-        String phone3 = memberService.join(member3);
-        em.flush();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
-        List<Member> list = memberService.findAll(20, 29);
+        List<Member> list = memberRepository.findByAgeBetween(20, 29);
         assertEquals(list.size(), 2);
 
-        List<Member> list2 = memberService.findAll(100, 109);
+        List<Member> list2 = memberRepository.findByAgeBetween(100, 109);
         assertEquals(list2.size(), 1);
         assertEquals(list2.get(0).getName(), "한보은");
     }
@@ -169,18 +176,15 @@ public class MemoryUserRepositoryTest {
         member3.setGender(Gender.FEMALE);
 
         //when
-        String phone = memberService.join(member);
-        em.flush();
-        String phone2 = memberService.join(member2);
-        em.flush();
-        String phone3 = memberService.join(member3);
-        em.flush();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
-        List<Member> female = memberService.findALl("FEMALE");
+        List<Member> female = memberRepository.findByGender(Gender.FEMALE);
         assertEquals(female.size(), 2);
 
-        List<Member> male = memberService.findALl("MALE");
+        List<Member> male = memberRepository.findByGender(Gender.MALE);
         assertEquals(male.size(), 1);
         assertEquals(male.get(0).getPhone(), "010-1234-5678");
     }
@@ -207,19 +211,16 @@ public class MemoryUserRepositoryTest {
         member3.setGender(Gender.FEMALE);
 
         //when
-        String phone = memberService.join(member);
-        em.flush();
-        String phone2 = memberService.join(member2);
-        em.flush();
-        String phone3 = memberService.join(member3);
-        em.flush();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
-        List<Member> list = memberService.findAll(20, 29, "FEMALE");
+        List<Member> list = memberRepository.findByAgeBetweenAndGender(20, 29, Gender.FEMALE);
         assertEquals(list.size(), 1);
         assertEquals(list.get(0).getPhone(), "010-4172-8563");
 
-        List<Member> list2 = memberService.findAll(20, 29, "MALE");
+        List<Member> list2 = memberRepository.findByAgeBetweenAndGender(20, 29, Gender.MALE);
         assertEquals(list2.size(), 1);
         assertEquals(list2.get(0).getPhone(), "010-1234-5678");
     }
@@ -238,13 +239,11 @@ public class MemoryUserRepositoryTest {
         member2.setAuthority(Authority.USER);
 
         //when
-        String phone = memberService.join(member);
-        em.flush();
-        String phone2 = memberService.join(member2);
-        em.flush();
+        memberRepository.save(member);
+        memberRepository.save(member2);
 
         //then
-        assertEquals(memberService.findOne("010-4172-8563").getAuthority(), Authority.ADMIN);
-        assertEquals(memberService.findOne("010-1234-5678").getAuthority(), Authority.USER);
+        assertEquals(memberRepository.findByPhone("010-4172-8563").get().getAuthority(), Authority.ADMIN);
+        assertEquals(memberRepository.findByPhone("010-1234-5678").get().getAuthority(), Authority.USER);
     }
 }

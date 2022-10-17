@@ -1,7 +1,10 @@
 package com.greentea.surgom.security;
 
 import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.repository.MemberRepository;
+import com.greentea.surgom.repository.TokenRepository;
+import com.greentea.surgom.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,7 +21,8 @@ import java.util.Collections;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    @Autowired private MemberRepository memberRepository;
+    @Autowired private MemberService memberService;
+    @Autowired private TokenRepository tokenRepository;
     @Autowired private HttpSession httpSession;
 
     @Override
@@ -32,8 +36,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        Member member = memberRepository.save(attributes.toEntity(registrationId));
+        Member member = memberService.save(attributes.toMemberEntity(registrationId));
+        Token token = tokenRepository.save(attributes.toTokenEntity());
         httpSession.setAttribute("member", new SessionMember(member));
+        httpSession.setAttribute("token", new SessionMember(token));
 
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
                 , attributes.getAttributes()

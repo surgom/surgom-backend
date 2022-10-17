@@ -14,9 +14,10 @@ public class LoginController {
     private HttpSession httpSession;
 
     @GetMapping("/login-success")
-    public String login_success_handler(SessionMember member, Model model) {
+    public String login_success_handler(SessionMember member, SessionMember token, Model model) {
         // httpSession에 저장된 user의 정보를 가져옵니다.
         member = (SessionMember) httpSession.getAttribute("member");
+        token = (SessionMember) httpSession.getAttribute("token");
 
         model.addAttribute("name", member.getName());
         model.addAttribute("nickname", member.getNickname());
@@ -26,6 +27,9 @@ public class LoginController {
         model.addAttribute("point", member.getPoint());
         model.addAttribute("authority", member.getAuthority());
         model.addAttribute("identifier", member.getIdentifier());
+
+        model.addAttribute("access_token", token.getAccess_token());
+        model.addAttribute("refresh_token", token.getRefresh_token());
 
         return "login/login-success";
     }

@@ -45,6 +45,8 @@ public class MemberOauthController {
             e.printStackTrace();
         }
 
+        model.addAttribute("access_token", naverProfile.getResponse().getAccess_token());
+        model.addAttribute("refresh_token", naverProfile.getResponse().getRefresh_token());
         model.addAttribute("name", naverProfile.getResponse().getName());
         model.addAttribute("nickname", naverProfile.getResponse().getNickname());
         model.addAttribute("gender", naverProfile.getResponse().getGender());

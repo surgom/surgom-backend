@@ -3,6 +3,7 @@ package com.greentea.surgom.security;
 import com.greentea.surgom.domain.Authority;
 import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.domain.Token;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,6 +27,9 @@ public class SessionMember implements Serializable {
     private Authority authority;
     private String identifier;
 
+    private String access_token;
+    private String refresh_token;
+
     public SessionMember() {
     }
 
@@ -38,5 +42,10 @@ public class SessionMember implements Serializable {
         this.point = member.getPoint();
         this.authority = member.getAuthority();
         this.identifier = member.getIdentifier();
+    }
+
+    public SessionMember(Token token) {
+        this.access_token = token.getAccess_token();
+        this.refresh_token = token.getRefresh_token();
     }
 }

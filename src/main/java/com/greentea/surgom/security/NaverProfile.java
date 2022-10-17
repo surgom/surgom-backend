@@ -18,5 +18,7 @@ public class NaverProfile {
         private String gender;
         private String birthyear;
         private String mobile;
+        private String access_token;
+        private String refresh_token;
     }
 }

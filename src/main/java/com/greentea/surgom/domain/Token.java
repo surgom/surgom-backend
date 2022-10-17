@@ -1,5 +1,6 @@
 package com.greentea.surgom.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,4 +18,15 @@ public class Token {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "member_token_phone")
     private Member member;
+
+    @Builder
+    public Token(String phone, String access_token, String refresh_token) {
+        this.phone = phone;
+        this.access_token = access_token;
+        this.refresh_token = refresh_token;
+    }
+
+    public Token() {
+
+    }
 }

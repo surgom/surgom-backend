@@ -1,8 +1,11 @@
 package com.greentea.surgom.service;
 
 import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.repository.MemberRepository;
+import com.greentea.surgom.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,20 +14,20 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class MemberService implements UserDetailsService {
+public class MemberService {
 
-    private final MemberRepository memberRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
-        Optional<Member> member = memberRepository.findByPhone(phone);
+    public Member save(Member member) {
+        Member member_result = memberRepository.save(member);
 
-        if (member == null)
-            throw new UsernameNotFoundException("존재하지 않는 회원입니다.");
+        Token token = new Token();
+        token.setPhone(member.getPhone());
+        tokenRepository.save(token);
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(phone)
-                .
+        return member_result;
     }
 }

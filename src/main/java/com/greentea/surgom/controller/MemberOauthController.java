@@ -1,5 +1,8 @@
 package com.greentea.surgom.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greentea.surgom.security.NaverProfile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,16 +36,21 @@ public class MemberOauthController {
                 String.class
         );
 
-//        NaverProfile naverProfile = null;
-//        try {
-//            naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        model.addAttribute("name", naverProfile.getResponse().getName());
-//        model.addAttribute("image", naverProfile.getResponse().getProfile_image());
-//
-//        return "/login/login-success";
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        NaverProfile naverProfile = null;
+        try {
+            naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        model.addAttribute("name", naverProfile.getResponse().getName());
+        model.addAttribute("nickname", naverProfile.getResponse().getNickname());
+        model.addAttribute("gender", naverProfile.getResponse().getGender());
+        model.addAttribute("birthyear", naverProfile.getResponse().getBirthyear());
+        model.addAttribute("mobile", naverProfile.getResponse().getMobile());
+
+        return "/login/login-success";
     }
 }

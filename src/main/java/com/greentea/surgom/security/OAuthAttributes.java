@@ -32,9 +32,6 @@ public class OAuthAttributes {
     public OAuthAttributes() {
     }
 
-    // 해당 로그인인 서비스가 kakao인지 google인지 구분하여, 알맞게 매핑을 해주도록 합니다.
-    // 여기서 registrationId는 OAuth2 로그인을 처리한 서비스 명("google","kakao","naver"..)이 되고,
-    // userNameAttributeName은 해당 서비스의 map의 키값이 되는 값이됩니다. {google="sub", kakao="id", naver="response"}
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         if (registrationId.equals("naver"))
             return ofNaver(userNameAttributeName, attributes);
@@ -54,12 +51,11 @@ public class OAuthAttributes {
                 (String) response.get("mobile"));
     }
 
-    // oauth2Service에서 registrationId까지 받아와 provider의 이름까지 저장해줍니다.
     public Member toEntity(String registrationId) {
         Gender enumGender;
         if (gender.equals("F")) enumGender = Gender.FEMALE;
         else enumGender = Gender.MALE;
 
-        return new Member(mobile, nickname, name, Integer.parseInt(birthyear), enumGender, 0L, Authority.USER, nameAttributeKey);
+        return new Member(mobile, nickname, name, Integer.parseInt(birthyear), enumGender, 0L, Authority.USER, registrationId);
     }
 }

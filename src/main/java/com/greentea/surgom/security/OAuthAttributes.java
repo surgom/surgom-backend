@@ -67,6 +67,6 @@ public class OAuthAttributes {
     }
 
     public Token toTokenEntity() {
-        return new Token(mobile, access_token, refresh_token);
+        return new Token(mobile, access_token, refresh_token, null, null);
     }
 }

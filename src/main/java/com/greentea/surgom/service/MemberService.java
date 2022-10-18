@@ -24,7 +24,7 @@ public class MemberService {
     public Member save(Member member) {
         Member member_result = memberRepository.save(member);
 
-        tokenRepository.save(new Token(member.getPhone(), null, null));
+        tokenRepository.save(new Token(member.getPhone(), null, null, null, null));
 
         return member_result;
     }

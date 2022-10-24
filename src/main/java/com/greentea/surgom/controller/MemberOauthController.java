@@ -2,7 +2,15 @@ package com.greentea.surgom.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greentea.surgom.domain.Authority;
+import com.greentea.surgom.domain.Gender;
+import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.security.NaverProfile;
+import com.greentea.surgom.service.MemberService;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,11 +20,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.Date;
 
 @Controller
 public class MemberOauthController {
+
+    @Autowired
+    MemberService memberService;
+    @Value("${jwt.token.secret-key")
+    private String secret_key;
+    @Value("${jwt.token.expire-length")
+    private long expire_time;
+
     @GetMapping("/naver")
+    @ResponseBody
     public String naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
                                      @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
                                      @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
@@ -39,20 +60,35 @@ public class MemberOauthController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         NaverProfile naverProfile = null;
+        String token = null;
         try {
             naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
+
+            Gender memberGender;
+            if (naverProfile.getResponse().getGender().equals("F")) memberGender = Gender.FEMALE;
+            else memberGender = Gender.MALE;
+
+            memberService.save(new Member(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getNickname(), naverProfile.getResponse().getName(), Integer.parseInt(naverProfile.getResponse().getBirthyear()), memberGender, 0L, Authority.USER, naverProfile.getResponse().getId()));
+
+            token = createJWTToken(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getName());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        model.addAttribute("access_token", naverProfile.getResponse().getAccess_token());
-        model.addAttribute("refresh_token", naverProfile.getResponse().getRefresh_token());
-        model.addAttribute("name", naverProfile.getResponse().getName());
-        model.addAttribute("nickname", naverProfile.getResponse().getNickname());
-        model.addAttribute("gender", naverProfile.getResponse().getGender());
-        model.addAttribute("birthyear", naverProfile.getResponse().getBirthyear());
-        model.addAttribute("mobile", naverProfile.getResponse().getMobile());
+        return token;
+    }
 
-        return "/login/login-success";
+    private String createJWTToken(String phone, String name) {
+        String token;
+
+        return token = Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setIssuer("surgom")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expire_time))
+                .claim("phone", phone)
+                .claim("name", name)
+                .signWith(SignatureAlgorithm.HS256, secret_key)
+                .compact();
     }
 }

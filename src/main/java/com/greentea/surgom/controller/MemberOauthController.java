@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greentea.surgom.domain.Authority;
 import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.domain.Token;
+import com.greentea.surgom.jwt.JwtTokenUtil;
+import com.greentea.surgom.repository.TokenRepository;
 import com.greentea.surgom.security.NaverProfile;
 import com.greentea.surgom.service.MemberService;
 import io.jsonwebtoken.Header;
@@ -25,16 +28,18 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class MemberOauthController {
 
     @Autowired
     MemberService memberService;
-    @Value("${jwt.token.secret-key")
-    private String secret_key;
-    @Value("${jwt.token.expire-length")
-    private long expire_time;
+    @Autowired
+    TokenRepository tokenRepository;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/naver")
     @ResponseBody
@@ -70,25 +75,19 @@ public class MemberOauthController {
 
             memberService.save(new Member(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getNickname(), naverProfile.getResponse().getName(), Integer.parseInt(naverProfile.getResponse().getBirthyear()), memberGender, 0L, Authority.USER, naverProfile.getResponse().getId()));
 
-            token = createJWTToken(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getName());
+            Map<String, Object> claim = new HashMap<String, Object>();
+            claim.put("phone", naverProfile.getResponse().getMobile());
+            claim.put("name", naverProfile.getResponse().getName());
+
+            String jwt_access = jwtTokenUtil.generateAccessToken(claim);
+            String jwt_refresh = jwtTokenUtil.generateRefreshToken(claim);
+
+            tokenRepository.save(new Token(naverProfile.getResponse().getMobile(), access_token, refresh_token, jwt_access, jwt_refresh));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
         return token;
-    }
-
-    private String createJWTToken(String phone, String name) {
-        String token;
-
-        return token = Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setIssuer("surgom")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expire_time))
-                .claim("phone", phone)
-                .claim("name", name)
-                .signWith(SignatureAlgorithm.HS256, secret_key)
-                .compact();
     }
 }

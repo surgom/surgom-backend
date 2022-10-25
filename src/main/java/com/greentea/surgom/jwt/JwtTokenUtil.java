@@ -3,11 +3,14 @@ package com.greentea.surgom.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +18,14 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-    @Value("${jwt.token.secret-key")
-    private String secret_key;
+    private Key secret_key;
     @Value("${jwt.token.expire-length")
     private long expire_time;
+
+    public JwtTokenUtil(@Value("${jwt.token.secret-key") String secret_key) {
+        byte[] keyBytes = Decoders.BASE64URL.decode(secret_key);;
+        this.secret_key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String getPhoneFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -42,26 +49,28 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateAccessToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return doGenerateAccessToken(claims, userDetails.getUsername());
+    public String generateAccessToken(Map<String, Object> claims) {
+        return doGenerateAccessToken(claims);
     }
 
-    private String doGenerateAccessToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    private String doGenerateAccessToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expire_time))
-                .signWith(SignatureAlgorithm.HS256, secret_key)
+                .signWith(secret_key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return doGenerateRefreshToken(claims, userDetails.getUsername());
+    public String generateRefreshToken(Map<String, Object> claims) {
+        return doGenerateRefreshToken(claims);
     }
 
-    private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .signWith(SignatureAlgorithm.HS256, secret_key)
+    private String doGenerateRefreshToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .signWith(secret_key, SignatureAlgorithm.HS512)
                 .compact();
     }
 

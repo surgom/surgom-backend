@@ -2,10 +2,7 @@ package com.greentea.surgom.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greentea.surgom.domain.Authority;
-import com.greentea.surgom.domain.Gender;
-import com.greentea.surgom.domain.Member;
-import com.greentea.surgom.domain.Token;
+import com.greentea.surgom.domain.*;
 import com.greentea.surgom.jwt.JwtTokenUtil;
 import com.greentea.surgom.repository.TokenRepository;
 import com.greentea.surgom.security.NaverProfile;
@@ -24,14 +21,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 public class MemberOauthController {
 
     @Autowired
@@ -42,11 +38,10 @@ public class MemberOauthController {
     JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/naver")
-    @ResponseBody
-    public String naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
-                                     @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
-                                     @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
-                                     @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}") String authorization_grant_type) {
+    public TokenDto naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
+                                       @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
+                                       @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
+                                       @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}") String authorization_grant_type) {
 
         RestTemplate rt = new RestTemplate();
 
@@ -65,7 +60,7 @@ public class MemberOauthController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         NaverProfile naverProfile = null;
-        String token = null;
+        TokenDto token = new TokenDto();
         try {
             naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
 
@@ -83,6 +78,9 @@ public class MemberOauthController {
             String jwt_refresh = jwtTokenUtil.generateRefreshToken(claim);
 
             tokenRepository.save(new Token(naverProfile.getResponse().getMobile(), access_token, refresh_token, jwt_access, jwt_refresh));
+
+            token.setJwt_access_token(jwt_access);
+            token.setJwt_refresh_token(jwt_refresh);
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();

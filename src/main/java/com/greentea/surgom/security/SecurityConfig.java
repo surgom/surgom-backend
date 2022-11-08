@@ -34,10 +34,10 @@ public class SecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers("/naver").permitAll()
+                .antMatchers("/test").authenticated()
                 .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
-                    .defaultSuccessUrl("/login-success")
                     .userInfoEndpoint()
                     .userService(customOAuth2UserService);
 

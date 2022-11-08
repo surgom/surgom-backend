@@ -2,18 +2,18 @@ package com.greentea.surgom.controller;
 
 import com.greentea.surgom.security.SessionMember;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 
-@Controller
+@RestController
 public class LoginController {
     @Autowired
     private HttpSession httpSession;
 
-    @GetMapping("/login-success")
+    @GetMapping("/member/inform")
     public String login_success_handler(SessionMember member, SessionMember token, Model model) {
         // httpSession에 저장된 user의 정보를 가져옵니다.
         member = (SessionMember) httpSession.getAttribute("member");

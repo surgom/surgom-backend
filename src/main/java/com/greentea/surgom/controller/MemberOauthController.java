@@ -32,11 +32,11 @@ public class MemberOauthController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping("/naver")
-    public MemberDto naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
-                                        @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
-                                        @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
-                                        @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}") String authorization_grant_type) {
+    @GetMapping("/join/naver")
+    public  ResponseEntity naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
+                                       @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
+                                       @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
+                                       @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}") String authorization_grant_type) {
 
         RestTemplate rt = new RestTemplate();
 
@@ -55,7 +55,7 @@ public class MemberOauthController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         NaverProfile naverProfile = null;
-        MemberDto member = new MemberDto();
+        TokenDto token = new TokenDto();
         try {
             naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
 
@@ -63,7 +63,7 @@ public class MemberOauthController {
             if (naverProfile.getResponse().getGender().equals("F")) memberGender = Gender.FEMALE;
             else memberGender = Gender.MALE;
 
-            Member save = memberService.save(new Member(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getNickname(), naverProfile.getResponse().getName(), Integer.parseInt(naverProfile.getResponse().getBirthyear()), memberGender, 0L, Authority.USER, naverProfile.getResponse().getId()));
+            memberService.save(new Member(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getNickname(), naverProfile.getResponse().getName(), Integer.parseInt(naverProfile.getResponse().getBirthyear()), memberGender, 0L, Authority.USER, naverProfile.getResponse().getId()));
 
             Map<String, Object> claim = new HashMap<String, Object>();
             claim.put("phone", naverProfile.getResponse().getMobile());
@@ -74,21 +74,15 @@ public class MemberOauthController {
 
             tokenRepository.save(new Token(naverProfile.getResponse().getMobile(), access_token, refresh_token, jwt_access, jwt_refresh));
 
-            member.setName(save.getName());
-            member.setPhone(save.getPhone());
-            member.setNickname(save.getNickname());
-            member.setAge(save.getAge());
-            member.setGender(save.getGender());
-            member.setPoint(save.getPoint());
-            member.setAuthority(save.getAuthority());
-            member.setIdentifier(save.getIdentifier());
-            member.setJwt_access_token(jwt_access);
-            member.setJwt_refresh_token(jwt_refresh);
+            token.setJwt_access_token(jwt_access);
+            token.setJwt_refresh_token(jwt_refresh);
 
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("Authorization", jwt_access);
+            return ResponseEntity.ok().headers(httpHeaders).body("success");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            return ResponseEntity.badRequest().body("fail");
         }
-
-        return member;
     }
 }

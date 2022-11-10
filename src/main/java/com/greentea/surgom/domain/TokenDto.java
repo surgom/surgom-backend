@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
-public class MemberDto {
+public class TokenDto {
     @Id
     private String phone;
     private String nickname;

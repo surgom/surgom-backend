@@ -20,7 +20,7 @@ public class informController {
     @Autowired
     private MemberService memberService;
 
-    @RequestMapping("/inform/member")
+    @GetMapping("/inform/member")
     public ResponseEntity<Object> getMemberInformation(HttpServletRequest request) {
         Optional<Member> member = memberService.getMember(request);
 

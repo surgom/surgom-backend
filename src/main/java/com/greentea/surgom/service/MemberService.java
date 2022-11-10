@@ -4,13 +4,10 @@ import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.repository.MemberRepository;
 import com.greentea.surgom.repository.TokenRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Service
@@ -27,5 +24,14 @@ public class MemberService {
         tokenRepository.save(new Token(member.getPhone(), null, null, null, null));
 
         return member_result;
+    }
+
+    public Optional<Member> getMember(HttpServletRequest request) {
+        Object jwt_access = request.getAttribute("jwt_access");
+
+        Optional<Token> member_token = tokenRepository.findByJwtAccess(jwt_access);
+        Optional<Member> Member = memberRepository.findByPhone(member_token.get().getPhone());
+
+        return Member;
     }
 }

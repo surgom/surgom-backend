@@ -3,7 +3,7 @@ package com.greentea.surgom.service;
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.repository.MemberRepository;
-import com.greentea.surgom.repository.TokenRepository;
+import com.greentea.surgom.repository.JWTTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class MemberService {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private TokenRepository tokenRepository;
+    private JWTTokenRepository tokenRepository;
 
     public Member save(Member member) {
         Member member_result = memberRepository.save(member);

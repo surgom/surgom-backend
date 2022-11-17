@@ -30,7 +30,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = null;
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            jwtToken = requestTokenHeader.split(" ")[1].trim();
             try {
                 phone = jwtTokenUtil.getPhoneFromToken(jwtToken);
             } catch (IllegalStateException e) {

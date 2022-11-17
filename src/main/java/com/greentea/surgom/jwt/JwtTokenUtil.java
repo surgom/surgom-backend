@@ -23,7 +23,7 @@ public class JwtTokenUtil implements Serializable {
     private long expire_time;
 
     public JwtTokenUtil(@Value("${jwt.token.secret-key") String secret_key) {
-        byte[] keyBytes = Decoders.BASE64URL.decode(secret_key);;
+        byte[] keyBytes = Decoders.BASE64URL.decode(secret_key);
         this.secret_key = Keys.hmacShaKeyFor(keyBytes);
     }
 

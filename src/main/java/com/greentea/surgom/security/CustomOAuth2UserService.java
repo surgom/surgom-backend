@@ -2,8 +2,7 @@ package com.greentea.surgom.security;
 
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
-import com.greentea.surgom.repository.MemberRepository;
-import com.greentea.surgom.repository.TokenRepository;
+import com.greentea.surgom.repository.JWTTokenRepository;
 import com.greentea.surgom.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,7 +21,7 @@ import java.util.Collections;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     @Autowired private MemberService memberService;
-    @Autowired private TokenRepository tokenRepository;
+    @Autowired private JWTTokenRepository tokenRepository;
     @Autowired private HttpSession httpSession;
 
     @Override

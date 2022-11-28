@@ -4,27 +4,25 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JwtTokenUtil implements Serializable {
-    private Key secret_key;
-    @Value("${jwt.token.expire-length")
+public class JWTTokenUtil implements Serializable {
+    @Value("${jwt.token.secret-key}")
+    private String secret_key;
+    @Value("${jwt.token.expire-length}")
     private long expire_time;
 
-    public JwtTokenUtil(@Value("${jwt.token.secret-key") String secret_key) {
-        byte[] keyBytes = Decoders.BASE64URL.decode(secret_key);
-        this.secret_key = Keys.hmacShaKeyFor(keyBytes);
+    public JWTTokenUtil(@Value("${jwt.token.secret-key}") String secret_key) {
+        byte[] keyBytes = Decoders.BASE64URL.decode(secret_key.replace('-', '+').replace('_', '/'));
+//        this.secret_key = Keys.hmacShaKeyFor(secret_key.toByteArray(StandardCharsets.UTF_8))
     }
 
     public String getPhoneFromToken(String token) {
@@ -58,7 +56,7 @@ public class JwtTokenUtil implements Serializable {
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expire_time))
-                .signWith(secret_key, SignatureAlgorithm.HS512)
+                .signWith(SignatureAlgorithm.HS256, secret_key)
                 .compact();
     }
 
@@ -70,7 +68,7 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .signWith(secret_key, SignatureAlgorithm.HS512)
+                .signWith(SignatureAlgorithm.HS256, secret_key)
                 .compact();
     }
 

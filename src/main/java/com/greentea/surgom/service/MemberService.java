@@ -29,7 +29,7 @@ public class MemberService {
     public Optional<Member> getMember(HttpServletRequest request) {
         Object jwt_access = request.getAttribute("jwt_access");
 
-        Optional<Token> member_token = tokenRepository.findByJwtAccess(jwt_access);
+        Optional<Token> member_token = tokenRepository.findByJwtAccessToken(jwt_access);
         Optional<Member> Member = memberRepository.findByPhone(member_token.get().getPhone());
 
         return Member;

@@ -3,7 +3,7 @@ package com.greentea.surgom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greentea.surgom.domain.*;
-import com.greentea.surgom.jwt.JwtTokenUtil;
+import com.greentea.surgom.jwt.JWTTokenUtil;
 import com.greentea.surgom.repository.JWTTokenRepository;
 import com.greentea.surgom.security.NaverProfile;
 import com.greentea.surgom.service.MemberService;
@@ -30,7 +30,7 @@ public class MemberOauthController {
     @Autowired
     JWTTokenRepository tokenRepository;
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
+    JWTTokenUtil jwtTokenUtil;
 
     @GetMapping("/join/naver")
     public  ResponseEntity naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,

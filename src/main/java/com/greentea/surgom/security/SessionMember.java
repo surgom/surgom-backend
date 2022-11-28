@@ -45,7 +45,7 @@ public class SessionMember implements Serializable {
     }
 
     public SessionMember(Token token) {
-        this.access_token = token.getAccess_token();
-        this.refresh_token = token.getRefresh_token();
+        this.access_token = token.getAccessToken();
+        this.refresh_token = token.getRefreshToken();
     }
 }

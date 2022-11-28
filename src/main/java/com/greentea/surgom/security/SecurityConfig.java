@@ -1,8 +1,8 @@
 package com.greentea.surgom.security;
 
-import com.greentea.surgom.jwt.JwtAccessDeniedHandler;
-import com.greentea.surgom.jwt.JwtAuthenticationEntryPoint;
-import com.greentea.surgom.jwt.JwtRequestFilter;
+import com.greentea.surgom.jwt.JWTAccessDeniedHandler;
+import com.greentea.surgom.jwt.JWTAuthenticationEntryPoint;
+import com.greentea.surgom.jwt.JWTRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,19 +12,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.Filter;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    private JWTRequestFilter jwtRequestFilter;
     @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Autowired
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private JWTAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

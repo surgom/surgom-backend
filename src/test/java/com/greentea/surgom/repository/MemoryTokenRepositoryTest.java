@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class MemoryTokenRepositoryTest {
 
     @Autowired private MemberService memberService;
-    @Autowired private JWTTokenRepository tokenRepository;
+    @Autowired private JwtTokenRepository tokenRepository;
 
     @Test
     public void 회원가입() throws Exception {

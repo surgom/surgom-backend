@@ -3,8 +3,9 @@ package com.greentea.surgom.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greentea.surgom.domain.*;
-import com.greentea.surgom.jwt.JWTTokenUtil;
-import com.greentea.surgom.repository.JWTTokenRepository;
+import com.greentea.surgom.dto.TokenDto;
+import com.greentea.surgom.jwt.TokenProvider;
+import com.greentea.surgom.repository.JwtTokenRepository;
 import com.greentea.surgom.security.NaverProfile;
 import com.greentea.surgom.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,27 +14,34 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 @RestController
 public class MemberOauthController {
 
     @Autowired
     MemberService memberService;
     @Autowired
-    JWTTokenRepository tokenRepository;
+    AuthenticationManagerBuilder authenticationManagerBuilder;
     @Autowired
-    JWTTokenUtil jwtTokenUtil;
+    JwtTokenRepository tokenRepository;
+    @Autowired
+    TokenProvider tokenProvider;
 
     @GetMapping("/join/naver")
-    public  ResponseEntity naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, Model model,
+    public  ResponseEntity naverOAuthRedirect(@RequestParam String access_token, @RequestParam String refresh_token, HttpServletResponse response,
                                        @Value("${spring.security.oauth2.client.registration.naver.client-id}") String client_id,
                                        @Value("${spring.security.oauth2.client.registration.naver.client-secret}") String client_secret,
                                        @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}") String authorization_grant_type) {
@@ -65,17 +73,17 @@ public class MemberOauthController {
 
             memberService.save(new Member(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getNickname(), naverProfile.getResponse().getName(), Integer.parseInt(naverProfile.getResponse().getBirthyear()), memberGender, 0L, Authority.USER, naverProfile.getResponse().getId()));
 
-            Map<String, Object> claim = new HashMap<String, Object>();
-            claim.put("phone", naverProfile.getResponse().getMobile());
-            claim.put("name", naverProfile.getResponse().getName());
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(naverProfile.getResponse().getMobile(), naverProfile.getResponse().getName());
 
-            String jwt_access = jwtTokenUtil.generateAccessToken(claim);
-            String jwt_refresh = jwtTokenUtil.generateRefreshToken(claim);
+            //authenticate시 CustomUserDetailsService의 loadbyusername실행
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String jwt_access = tokenProvider.createAccessToken(authentication);
+            String jwt_refresh = tokenProvider.createRefreshToken(authentication);
 
             tokenRepository.save(new Token(naverProfile.getResponse().getMobile(), access_token, refresh_token, jwt_access, jwt_refresh));
-
-            token.setJwt_access_token(jwt_access);
-            token.setJwt_refresh_token(jwt_refresh);
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add("Authorization", jwt_access);

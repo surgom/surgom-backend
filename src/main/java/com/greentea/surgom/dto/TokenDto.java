@@ -1,25 +1,20 @@
-package com.greentea.surgom.domain;
+package com.greentea.surgom.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import javax.persistence.*;
-
-@Entity
 @Getter
 @Builder
 @NoArgsConstructor
-public class Token {
-    @Id
+public class TokenDto {
     private String phone;
     private String accessToken;
     private String refreshToken;
     private String jwtAccessToken;
     private String jwtRefreshToken;
 
-    public Token(String phone, String accessToken, String refreshToken, String jwtAccessToken, String jwtRefreshToken) {
+    public TokenDto(String phone, String accessToken, String refreshToken, String jwtAccessToken, String jwtRefreshToken) {
         this.phone = phone;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;

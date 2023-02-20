@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 public class Member {
     @Id
@@ -24,7 +25,13 @@ public class Member {
     private Authority authority;
     private String identifier;
 
-    @Builder
+    @OneToOne
+    @JoinTable(
+            name = "member_token",
+            joinColumns = {@JoinColumn(name = "member_phone", referencedColumnName = "phone")},
+            inverseJoinColumns = {@JoinColumn(name = "accessToken", referencedColumnName = "accessToken")})
+    private Token token;
+
     public Member(String phone, String nickname, String name, int age, Gender gender, Long point, Authority authority, String identifier) {
         this.phone = phone;
         this.nickname = nickname;
@@ -34,6 +41,18 @@ public class Member {
         this.point = point;
         this.authority = authority;
         this.identifier = identifier;
+    }
+
+    public Member(String phone, String nickname, String name, int age, Gender gender, Long point, Authority authority, String identifier, Token token) {
+        this.phone = phone;
+        this.nickname = nickname;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.point = point;
+        this.authority = authority;
+        this.identifier = identifier;
+        this.token = token;
     }
 }
 

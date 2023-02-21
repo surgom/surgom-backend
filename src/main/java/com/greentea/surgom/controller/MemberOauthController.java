@@ -63,7 +63,6 @@ public class MemberOauthController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         NaverProfile naverProfile = null;
-        TokenDto token = new TokenDto();
         try {
             naverProfile = objectMapper.readValue(profileResponse.getBody(), NaverProfile.class);
 

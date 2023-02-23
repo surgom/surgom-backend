@@ -15,6 +15,6 @@ public class TestController {
     @ResponseBody
     @RequestMapping("/NaverLoginCallback")
     public String NaverLoginCallback(@RequestParam Map<String, String> resValue){
-        return resValue.get("code");
+        return "redirect:/join/naver";
     }
 }

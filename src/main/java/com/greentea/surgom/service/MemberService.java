@@ -3,6 +3,7 @@ package com.greentea.surgom.service;
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.dto.MemberDto;
+import com.greentea.surgom.dto.TokenDto;
 import com.greentea.surgom.exception.DuplicateMemberException;
 import com.greentea.surgom.repository.MemberRepository;
 import com.greentea.surgom.repository.JwtTokenRepository;
@@ -20,20 +21,17 @@ public class MemberService {
     private MemberRepository memberRepository;
     @Autowired
     private JwtTokenRepository tokenRepository;
+    @Autowired
+    private TokenService tokenService;
 
-    public Member save(Member member) {
-        Member member_result = memberRepository.save(member);
-
-        tokenRepository.save(new Token(member.getPhone(), null, null, null, null));
-
-        return member_result;
+    public Optional<Token> isMember(String phone) {
+        if (memberRepository.findByPhone(phone).orElse(null) != null)
+            throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
+        return tokenService.getToken(phone);
     }
 
     @Transactional
-    public MemberDto signUp(MemberDto memberDto) {
-        if (memberRepository.findByPhone(memberDto.getPhone()).orElse(null) != null) {
-            throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
-        }
+    public void signUp(MemberDto memberDto, TokenDto tokenDto) {
 
         Member member = Member.builder()
                 .phone(memberDto.getPhone())
@@ -46,13 +44,19 @@ public class MemberService {
                 .identifier(memberDto.getIdentifier())
                 .build();
 
-        return MemberDto.from(memberRepository.save(member));
+        memberRepository.save(member);
+
+        Token token = Token.builder()
+                .phone(tokenDto.getPhone())
+                .jwtAccessToken(tokenDto.getJwtAccessToken())
+                .jwtRefreshToken(tokenDto.getJwtRefreshToken())
+                .build();
+
+        tokenRepository.save(token);
     }
 
-    public Optional<Member> getMember(HttpServletRequest request) {
-        Object jwt_access = request.getAttribute("jwt_access");
-
-        Optional<Token> member_token = tokenRepository.findByJwtAccessToken(jwt_access);
+    public Optional<Member> getMember(String jwt_access_token) {
+        Optional<Token> member_token = tokenRepository.findByJwtAccessToken(jwt_access_token);
         Optional<Member> Member = memberRepository.findByPhone(member_token.get().getPhone());
 
         return Member;

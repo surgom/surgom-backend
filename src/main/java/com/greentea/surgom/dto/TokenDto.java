@@ -9,15 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TokenDto {
     private String phone;
-    private String accessToken;
-    private String refreshToken;
     private String jwtAccessToken;
     private String jwtRefreshToken;
 
-    public TokenDto(String phone, String accessToken, String refreshToken, String jwtAccessToken, String jwtRefreshToken) {
+    public TokenDto(String phone, String jwtAccessToken, String jwtRefreshToken) {
         this.phone = phone;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.jwtAccessToken = jwtAccessToken;
         this.jwtRefreshToken = jwtRefreshToken;
     }

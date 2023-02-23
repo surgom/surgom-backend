@@ -14,15 +14,11 @@ import javax.persistence.*;
 public class Token {
     @Id
     private String phone;
-    private String accessToken;
-    private String refreshToken;
     private String jwtAccessToken;
     private String jwtRefreshToken;
 
-    public Token(String phone, String accessToken, String refreshToken, String jwtAccessToken, String jwtRefreshToken) {
+    public Token(String phone, String jwtAccessToken, String jwtRefreshToken) {
         this.phone = phone;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.jwtAccessToken = jwtAccessToken;
         this.jwtRefreshToken = jwtRefreshToken;
     }

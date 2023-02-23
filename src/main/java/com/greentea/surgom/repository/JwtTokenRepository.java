@@ -14,8 +14,8 @@ import java.util.Optional;
 @Transactional
 public interface JwtTokenRepository extends JpaRepository<Token, Long> {
     Optional<Token> findByPhone(String phone);
-    Optional<Token> findByJwtAccessToken(Object token);
-    @Query("update Token t set t.accessToken = :access_token where t.refreshToken = :refresh_token")
+    Optional<Token> findByJwtAccessToken(String jwtAccessToken);
+    @Query("update Token t set t.jwtAccessToken = :jwtAccessToken where t.jwtRefreshToken = :jwtRefreshToken")
     @Modifying
-    void updateAccess_token(@Param("access_token") String access_token, @Param("refresh_token") String refresh_token);
+    void updateAccess_token(@Param("jwtAccessToken") String jwtAccessToken, @Param("jwtRefreshToken") String jwtRefreshToken);
 }

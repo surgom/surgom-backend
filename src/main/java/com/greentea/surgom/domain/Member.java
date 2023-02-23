@@ -29,7 +29,7 @@ public class Member {
     @JoinTable(
             name = "member_token",
             joinColumns = {@JoinColumn(name = "member_phone", referencedColumnName = "phone")},
-            inverseJoinColumns = {@JoinColumn(name = "accessToken", referencedColumnName = "accessToken")})
+            inverseJoinColumns = {@JoinColumn(name = "jwtAccessToken", referencedColumnName = "jwtAccessToken")})
     private Token token;
 
     public Member(String phone, String nickname, String name, int age, Gender gender, Long point, Authority authority, String identifier) {

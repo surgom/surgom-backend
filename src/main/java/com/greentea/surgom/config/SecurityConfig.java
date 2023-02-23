@@ -61,10 +61,9 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeHttpRequests()
-//                .antMatchers("/api/*").permitAll()
+                .antMatchers("/", "/join/naver").permitAll()
                 .requestMatchers(PathRequest.toH2Console()).permitAll()
-                .anyRequest().permitAll()
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
 
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider));

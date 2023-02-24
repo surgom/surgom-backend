@@ -47,7 +47,7 @@ public class MemberOauthController {
     @Autowired
     TokenService tokenService;
 
-    @GetMapping("/join/naver")
+    @GetMapping(value = "/join/naver", produces = "application/json; charset=utf8")
     public  ResponseEntity naverOAuthRedirect(@RequestParam Map<String, String> resValue) {
         NaverLoginVo naverLoginVo = naverLoginService.requestNaverLoginAccessToken(resValue, "authorization_code");
         NaverProfileVo naverProfileVo = naverLoginService.requestNaverLoginProfile(naverLoginVo);
@@ -86,6 +86,7 @@ public class MemberOauthController {
 //        } catch (Exception e) {
 //            return ResponseEntity.ok(e.getMessage());
 //        }
-        return ResponseEntity.ok(memberDto);
+
+        return ResponseEntity.ok(naverProfileVo);
     }
 }

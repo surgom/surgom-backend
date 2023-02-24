@@ -54,6 +54,6 @@ public class NaverLoginService {
                 .retrieve()
                 .bodyToMono(NaverProfileResponseVo.class)
                 .block()
-                .getResponse(); // NaverLoginProfile 은 건네준다.
+                .getResponse();
     }
 }

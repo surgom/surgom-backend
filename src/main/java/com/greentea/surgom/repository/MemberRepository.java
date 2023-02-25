@@ -2,6 +2,7 @@ package com.greentea.surgom.repository;
 
 import com.greentea.surgom.domain.Gender;
 import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.dto.MemberDto;
 import org.hibernate.annotations.SQLUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @Transactional
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByPhone(String phone);
+    Optional<Member> findByName(String name);
     Optional<Member> findByPhoneAndIdentifier(String phone, String identifier);
     List<Member> findByAgeBetween(int first, int last);
     List<Member> findByGender(Gender gender);

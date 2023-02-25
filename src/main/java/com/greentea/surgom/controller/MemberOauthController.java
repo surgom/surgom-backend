@@ -62,31 +62,34 @@ public class MemberOauthController {
                 0L, Authority.USER, "Naver"
                 );
 
-//        try {
-//            memberService.isMember(naverProfileVo.getMobile());
-//
-//            UsernamePasswordAuthenticationToken authenticationToken =
-//                    new UsernamePasswordAuthenticationToken(naverProfileVo.getMobile(), naverProfileVo.getName());
-//
-//            //authenticate시 CustomMemberDetailsService의 loadbyusername실행
-//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            String jwt_access = tokenProvider.createAccessToken(authentication);
-//            String jwt_refresh = tokenProvider.createRefreshToken(authentication);
-//
-//            TokenDto tokenDto = new TokenDto(
-//                    naverProfileVo.getMobile(),
-//                    jwt_access,
-//                    jwt_refresh
-//                    );
-//
-//            memberService.signUp(memberDto, tokenDto);
-//            return ResponseEntity.ok(tokenDto);
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(e.getMessage());
-//        }
+        try {
+            memberService.isMember(naverProfileVo.getMobile());
 
-        return ResponseEntity.ok(naverProfileVo);
+            MemberDto save_member = memberService.signUp(memberDto);
+
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(memberDto.getName(), memberDto.getPhone());
+
+            //authenticate시 CustomMemberDetailsService의 loadbyusername실행
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String jwt_access = tokenProvider.createAccessToken(authentication);
+            String jwt_refresh = tokenProvider.createRefreshToken(authentication);
+
+            TokenDto tokenDto = new TokenDto(
+                    save_member.getPhone(),
+                    jwt_access,
+                    jwt_refresh
+                    );
+
+//            memberService.addJwtToken(tokenDto);
+
+//            Optional<Member> member = memberService.getMember(jwt_access);
+            return ResponseEntity.ok(tokenDto);
+//            return ResponseEntity.ok(save_member);
+        } catch (Exception e) {
+            return ResponseEntity.ok(e.getMessage());
+        }
     }
 }

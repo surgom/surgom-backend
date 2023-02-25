@@ -2,6 +2,7 @@ package com.greentea.surgom.repository;
 
 import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
+import com.greentea.surgom.dto.MemberDto;
 import com.greentea.surgom.service.MemberService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -25,12 +26,13 @@ public class MemoryTokenRepositoryTest {
     @Test
     public void 회원가입() throws Exception {
         //given
-        Member member = new Member();
-        member.setName("박성하");
-        member.setPhone("010-4172-8563");
+        MemberDto member = MemberDto.builder()
+                .name("박성하")
+                .phone("010-4172-8563")
+                .build();
 
         //when
-        Member member_result = memberService.save(member);
+        MemberDto member_result = memberService.signUp(member);
 
         //then
         Optional<Token> token_result = tokenRepository.findByPhone(member.getPhone());

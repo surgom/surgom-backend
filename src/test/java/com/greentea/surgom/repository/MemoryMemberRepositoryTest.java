@@ -51,8 +51,8 @@ public class MemoryMemberRepositoryTest {
         member2.setPhone("010-4172-8563");
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member2);
 
         //then
         fail("예외가 발생했습니다.");
@@ -66,7 +66,7 @@ public class MemoryMemberRepositoryTest {
         member.setPhone("010-4172-8563");
 
         //when
-        Member member_result = memberService.save(member);
+        Member member_result = memberRepository.save(member);
         memberRepository.delete(member_result);
 
         //then
@@ -85,8 +85,8 @@ public class MemoryMemberRepositoryTest {
         member2.setPhone("010-1234-5678");
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member2);
         memberRepository.deleteAllInBatch();
 
         //then
@@ -101,9 +101,9 @@ public class MemoryMemberRepositoryTest {
         member.setPhone("010-4172-8563");
 
         //when
-        Member member_result = memberService.save(member);
+        Member member_result = memberRepository.save(member);
         member.setName("한보은");
-        memberService.save(member);
+        memberRepository.save(member);
 
         //then
         assertEquals(memberRepository.findByPhone("010-4172-8563").get().getName(), "한보은");
@@ -118,7 +118,7 @@ public class MemoryMemberRepositoryTest {
         member.setIdentifier("its' me");
 
         //when
-        Member member_result = memberService.save(member);
+        Member member_result = memberRepository.save(member);
         member.setPhone("010-1234-5678");
         memberRepository.updatePhone(member.getPhone(), member.getIdentifier());
 
@@ -145,9 +145,9 @@ public class MemoryMemberRepositoryTest {
         member3.setAge(2000);
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
-        memberService.save(member3);
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
         List<Member> list = memberRepository.findByAgeBetween(1994, 2000);
@@ -177,9 +177,9 @@ public class MemoryMemberRepositoryTest {
         member3.setGender(Gender.FEMALE);
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
-        memberService.save(member3);
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
         List<Member> female = memberRepository.findByGender(Gender.FEMALE);
@@ -212,9 +212,9 @@ public class MemoryMemberRepositoryTest {
         member3.setGender(Gender.FEMALE);
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
-        memberService.save(member3);
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
 
         //then
         List<Member> list = memberRepository.findByAgeBetweenAndGender(1994, 2000, Gender.FEMALE);
@@ -240,8 +240,8 @@ public class MemoryMemberRepositoryTest {
         member2.setAuthority(Authority.USER);
 
         //when
-        memberService.save(member);
-        memberService.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member2);
 
         //then
         assertEquals(memberRepository.findByPhone("010-4172-8563").get().getAuthority(), Authority.ADMIN);

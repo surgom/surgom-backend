@@ -8,6 +8,7 @@ import com.greentea.surgom.exception.DuplicateMemberException;
 import com.greentea.surgom.repository.MemberRepository;
 import com.greentea.surgom.repository.JwtTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ public class MemberService {
     private JwtTokenRepository tokenRepository;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Optional<Token> isMember(String phone) {
         if (memberRepository.findByPhone(phone).orElse(null) != null)
@@ -31,10 +34,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void signUp(MemberDto memberDto, TokenDto tokenDto) {
+    public MemberDto signUp(MemberDto memberDto) {
 
         Member member = Member.builder()
-                .phone(memberDto.getPhone())
+                .phone(passwordEncoder.encode(memberDto.getPhone()))
                 .nickname(memberDto.getNickname())
                 .name(memberDto.getName())
                 .age(memberDto.getAge())
@@ -44,7 +47,12 @@ public class MemberService {
                 .identifier(memberDto.getIdentifier())
                 .build();
 
-        memberRepository.save(member);
+        return MemberDto.from(memberRepository.save(member));
+    }
+
+    @Transactional
+    public void addJwtToken(TokenDto tokenDto) {
+        Optional<Member> member = memberRepository.findByPhone(tokenDto.getPhone());
 
         Token token = Token.builder()
                 .phone(tokenDto.getPhone())
@@ -52,7 +60,7 @@ public class MemberService {
                 .jwtRefreshToken(tokenDto.getJwtRefreshToken())
                 .build();
 
-        tokenRepository.save(token);
+        member.get().setToken(token);
     }
 
     public Optional<Member> getMember(String jwt_access_token) {

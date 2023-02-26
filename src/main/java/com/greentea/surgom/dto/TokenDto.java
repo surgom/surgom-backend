@@ -1,5 +1,7 @@
 package com.greentea.surgom.dto;
 
+import com.greentea.surgom.domain.Member;
+import com.greentea.surgom.domain.Token;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +18,15 @@ public class TokenDto {
         this.phone = phone;
         this.jwtAccessToken = jwtAccessToken;
         this.jwtRefreshToken = jwtRefreshToken;
+    }
+
+    public static TokenDto from(Token token) {
+        if (token == null) return null;
+
+        return TokenDto.builder()
+                .phone(token.getPhone())
+                .jwtAccessToken(token.getJwtAccessToken())
+                .jwtRefreshToken(token.getJwtRefreshToken())
+                .build();
     }
 }

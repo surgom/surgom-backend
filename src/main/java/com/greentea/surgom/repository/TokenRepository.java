@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface JwtTokenRepository extends JpaRepository<Token, Long> {
+public interface TokenRepository extends JpaRepository<Token, Long> {
     Optional<Token> findByPhone(String phone);
     Optional<Token> findByJwtAccessToken(String jwtAccessToken);
     @Query("update Token t set t.jwtAccessToken = :jwtAccessToken where t.jwtRefreshToken = :jwtRefreshToken")

@@ -1,6 +1,5 @@
 package com.greentea.surgom.repository;
 
-import com.greentea.surgom.domain.Member;
 import com.greentea.surgom.domain.Token;
 import com.greentea.surgom.dto.MemberDto;
 import com.greentea.surgom.service.MemberService;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class MemoryTokenRepositoryTest {
 
     @Autowired private MemberService memberService;
-    @Autowired private JwtTokenRepository tokenRepository;
+    @Autowired private TokenRepository tokenRepository;
 
     @Test
     public void 회원가입() throws Exception {

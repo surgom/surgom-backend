@@ -1,37 +1,28 @@
 package com.greentea.surgom.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greentea.surgom.domain.*;
 import com.greentea.surgom.dto.MemberDto;
 import com.greentea.surgom.dto.TokenDto;
+import com.greentea.surgom.jwt.JwtFilter;
 import com.greentea.surgom.jwt.TokenProvider;
-import com.greentea.surgom.repository.JwtTokenRepository;
 import com.greentea.surgom.service.MemberService;
 import com.greentea.surgom.service.NaverLoginService;
 import com.greentea.surgom.service.TokenService;
 import com.greentea.surgom.vo.NaverLoginVo;
 import com.greentea.surgom.vo.NaverProfileVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 public class MemberOauthController {
@@ -52,25 +43,24 @@ public class MemberOauthController {
         NaverLoginVo naverLoginVo = naverLoginService.requestNaverLoginAccessToken(resValue, "authorization_code");
         NaverProfileVo naverProfileVo = naverLoginService.requestNaverLoginProfile(naverLoginVo);
 
-        Gender gender = naverProfileVo.getGender() == "Female" ? Gender.FEMALE : Gender.MALE;
-        MemberDto memberDto = new MemberDto(
-                naverProfileVo.getMobile(),
-                naverProfileVo.getNickname(),
-                naverProfileVo.getName(),
-                Integer.parseInt(naverProfileVo.getBirthyear()),
-                gender,
-                0L, Authority.USER, "Naver"
-                );
-
         try {
-            memberService.isMember(naverProfileVo.getMobile());
+            //member
+            Gender gender = naverProfileVo.getGender() == "Female" ? Gender.FEMALE : Gender.MALE;
+            MemberDto memberDto = new MemberDto(
+                    naverProfileVo.getMobile(),
+                    naverProfileVo.getNickname(),
+                    naverProfileVo.getName(),
+                    Integer.parseInt(naverProfileVo.getBirthyear()),
+                    gender,
+                    0L, Authority.USER, "Naver"
+            );
 
             MemberDto save_member = memberService.signUp(memberDto);
 
+            //token
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(memberDto.getName(), memberDto.getPhone());
 
-            //authenticate시 CustomMemberDetailsService의 loadbyusername실행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -83,10 +73,12 @@ public class MemberOauthController {
                     jwt_refresh
                     );
 
-//            memberService.addJwtToken(tokenDto);
+            TokenDto save_token = tokenService.signUp(tokenDto);
 
-//            Optional<Member> member = memberService.getMember(jwt_access);
-            return ResponseEntity.ok(tokenDto);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + save_token.getJwtAccessToken());
+
+            return new ResponseEntity<>(save_token, httpHeaders, HttpStatus.OK);
 //            return ResponseEntity.ok(save_member);
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());

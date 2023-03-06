@@ -78,8 +78,7 @@ public class MemberOauthController {
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + save_token.getJwtAccessToken());
 
-            return new ResponseEntity<>(save_token, httpHeaders, HttpStatus.OK);
-//            return ResponseEntity.ok(save_member);
+            return new ResponseEntity<>(save_token.getJwtAccessToken(), httpHeaders, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.ok(e.getMessage());
         }
